@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GEO Reporting System — ROI Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:#0f172a;--ink-muted:#475569;--ink-faint:#94a3b8;
+  --bg-page:#eef2f7;--bg-card:#ffffff;--bg-subtle:#f8fafc;--border:#e2e8f0;
+  --brand:#1d4ed8;--brand-lt:#eff6ff;--brand-mid:#bfdbfe;
+  --success:#15803d;--success-bg:#f0fdf4;
+  --warning:#c2410c;--warning-bg:#fff7ed;
+  --danger:#dc2626;--danger-bg:#fef2f2;
+  --teal:#0f766e;--teal-bg:#f0fdfa;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;
+  --amber:#b45309;--amber-bg:#fffbeb;
+  --shadow:0 1px 3px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.06);
+  --shadow-lg:0 8px 32px rgba(15,23,42,.12);
+  --r-sm:8px;--r-md:12px;--r-lg:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.nav{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{display:flex;flex-direction:column;gap:1px}
+.nav-eyebrow{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint)}
+.nav-title{font-size:16px;font-weight:700;color:var(--ink)}
+.nav-links{display:flex;gap:24px}
+.nav-links a{font-size:13px;font-weight:500;color:var(--ink-muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--brand)}
+.nav-links a.active{font-weight:600}
+.page{max-width:1280px;margin:0 auto;padding:32px 28px 60px}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+.page-eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px}
+.page-title{font-size:30px;font-weight:700;color:var(--ink);line-height:1.15}
+.page-title span{color:var(--brand)}
+.page-sub{margin-top:7px;font-size:14px;color:var(--ink-muted);max-width:520px}
+.view-toggle{display:flex;gap:2px;background:var(--bg-subtle);padding:3px;border-radius:var(--r-sm);border:1px solid var(--border)}
+.vt-btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:6px 16px;border-radius:6px;border:none;cursor:pointer;color:var(--ink-muted);background:transparent;transition:all .15s}
+.vt-btn.active{background:var(--brand);color:#fff;font-weight:600;box-shadow:0 1px 4px rgba(15,23,42,.12)}
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+@media(max-width:720px){.scenario-grid{grid-template-columns:1fr}}
+.scenario-card{background:var(--bg-card);border:2px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;transition:all .15s;box-shadow:var(--shadow)}
+.scenario-card:hover{border-color:var(--brand-mid);transform:translateY(-1px)}
+.scenario-card.active{border-color:var(--brand);background:var(--brand-lt)}
+.sc-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.sc-label{font-size:14px;font-weight:700;color:var(--ink)}
+.sc-desc{font-size:12px;color:var(--ink-muted);margin-bottom:4px}
+.sc-gain{font-size:11px;color:var(--ink-faint)}
+.main-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:20px;align-items:start}
+@media(max-width:1040px){.main-grid{grid-template-columns:1fr}}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.sect-lbl{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px;margin-top:20px;display:block}
+.sect-lbl:first-child{margin-top:0}
+.sl-row{margin-bottom:18px}
+.sl-row:last-child{margin-bottom:0}
+.sl-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.sl-label{font-size:13px;font-weight:500;color:var(--ink-muted)}
+.sl-val{font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--bg-subtle);color:var(--ink);border:1px solid var(--border);min-width:72px;text-align:center;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;height:4px;appearance:none;-webkit-appearance:none;background:var(--border);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 1px 4px rgba(29,78,216,.3);cursor:pointer;transition:transform .1s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+input[type=range].muted::-webkit-slider-thumb{background:var(--ink-faint)}
+.info-box{background:var(--brand-lt);border:1px solid var(--brand-mid);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:18px}
+.info-box p{font-size:13px;font-weight:500;color:var(--brand)}
+.info-box small{font-size:11px;color:var(--ink-muted);font-weight:400}
+.mult-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;background:transparent;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;border-radius:var(--r-lg)}
+.mult-toggle:hover{background:var(--bg-subtle)}
+.mt-title{font-size:14px;font-weight:700;color:var(--ink)}
+.mt-sub{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.mt-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--bg-subtle);color:var(--ink-muted);border:1px solid var(--border);white-space:nowrap}
+.mult-body{padding:0 20px 20px;border-top:1px solid var(--border)}
+.live-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:var(--r-sm);background:var(--bg-subtle);border:1px solid var(--border);margin-bottom:16px;margin-top:14px}
+.lt-title{font-size:13px;font-weight:600;color:var(--ink)}
+.lt-sub{font-size:11px;color:var(--ink-muted);margin-top:1px}
+.tog{position:relative;width:40px;height:22px;background:var(--border);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0;border:none;padding:0}
+.tog.on{background:var(--brand)}
+.tok{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .2s}
+.tog.on .tok{transform:translateX(18px)}
+.chip{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.chip.blue{background:var(--brand-lt);color:var(--brand)}
+.chip.green{background:var(--success-bg);color:var(--success)}
+.chip.orange{background:var(--warning-bg);color:var(--warning)}
+.chip.gray{background:var(--bg-subtle);color:var(--ink-muted);border:1px solid var(--border)}
+.out-col{display:flex;flex-direction:column;gap:14px}
+.res-card{padding:20px 22px}
+.res-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:16px}
+.res-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)}
+.res-row:last-child{border-bottom:none}
+.res-row.hi{background:var(--bg-subtle);border-radius:var(--r-sm);padding:8px 12px;border:none;margin:4px -12px}
+.res-lbl{font-size:13px;color:var(--ink-muted)}
+.res-val{font-size:13px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.res-row.hi .res-val{font-size:14px}
+.eff-box{margin-top:12px;padding:10px 12px;border-radius:var(--r-sm);background:var(--brand-lt);border:1px solid var(--brand-mid)}
+.eff-row{font-size:12px;color:var(--ink-muted);display:flex;justify-content:space-between;padding:1px 0}
+.eff-row strong{color:var(--ink)}
+.rev-card{padding:20px 22px}
+.rev-ey{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+.rev-amt{font-size:40px;font-weight:700;color:var(--success);line-height:1;font-variant-numeric:tabular-nums}
+.rev-per{font-size:12px;color:var(--ink-faint);margin-top:3px;margin-bottom:10px}
+.rev-note{font-size:13px;color:var(--ink-muted)}
+.roi-box{margin-top:14px;background:var(--bg-subtle);border-radius:var(--r-md);padding:14px 16px;border:1px solid var(--border)}
+.roi-lbl{font-size:12px;color:var(--ink-muted);margin-bottom:3px}
+.roi-val{font-size:32px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.roi-band{font-size:11px;color:var(--ink-faint);margin-top:2px}
+.as-card{padding:18px 20px}
+.as-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:12px}
+.as-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:all .15s;background:var(--bg-subtle);font-family:'DM Sans',sans-serif;text-align:left;width:100%}
+.as-row:last-child{margin-bottom:0}
+.as-row:hover{border-color:var(--brand-mid);background:var(--brand-lt)}
+.as-row.active{border-color:var(--brand);background:var(--brand-lt)}
+.as-name{font-size:13px;font-weight:600;color:var(--ink)}
+.as-band{font-size:11px;color:var(--ink-faint);margin-top:1px}
+.as-rev{font-size:13px;font-weight:700;color:var(--success);text-align:right;font-variant-numeric:tabular-nums}
+.as-mult{font-size:11px;color:var(--ink-muted);text-align:right}
+.quote-card{padding:16px 20px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);border-left:4px solid var(--brand)}
+.quote-text{font-size:13px;font-style:italic;color:var(--ink-muted);line-height:1.6}
+.quote-text strong{font-style:normal;color:var(--ink)}
+.mult-note{font-size:11px;color:var(--ink-faint);margin-top:12px;font-style:italic}
+.lmap{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
+.lmap th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);padding:0 8px 6px;border-bottom:1px solid var(--border)}
+.lmap td{padding:7px 8px;border-bottom:1px solid var(--border);color:var(--ink-muted);vertical-align:top;line-height:1.4}
+.lmap tr:last-child td{border-bottom:none}
+.lmap td:first-child{font-weight:600;color:var(--ink);white-space:nowrap}
+.tag{font-size:10px;font-weight:600;padding:1px 7px;border-radius:999px}
+.tag.teal{background:var(--teal-bg);color:var(--teal)}
+.tag.purple{background:var(--purple-bg);color:var(--purple)}
+.tag.amber{background:var(--amber-bg);color:var(--amber)}
+.inputs-card{padding:22px 24px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .3s ease both}
+.d1{animation-delay:.04s}.d2{animation-delay:.09s}.d3{animation-delay:.14s}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="nav-eyebrow">White-label starter</span>
+      <span class="nav-title">GEO Reporting System</span>
+    </div>
+    <div class="nav-links">
+      <a href="geo-dashboard-demo.html">Dashboard</a>
+      <a href="#" class="active">ROI Calculator</a>
+    </div>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="page-header anim">
+    <div>
+      <p class="page-eyebrow">Revenue modeling</p>
+      <h1 class="page-title">GEO <span>ROI Calculator</span></h1>
+      <p class="page-sub">Model how increased AI inclusion translates into leads and revenue. Toggle to Scenario View to apply metric-level improvements.</p>
+    </div>
+    <div class="view-toggle">
+      <button class="vt-btn active" id="btn-base" onclick="setView('base')">Base Model</button>
+      <button class="vt-btn" id="btn-scenario" onclick="setView('scenario')">Scenario View</button>
+    </div>
+  </div>
+
+  <div class="scenario-grid" id="scenario-grid" style="display:none">
+    <button class="scenario-card" id="sc-conservative" onclick="setScenario('conservative')">
+      <div class="sc-hd"><span class="sc-label">Conservative</span><span class="chip blue">2–5x ROI</span></div>
+      <div class="sc-desc">Modest inclusion improvement, minimal funnel lift.</div>
+      <div class="sc-gain">+7pp inclusion gain</div>
+    </button>
+    <button class="scenario-card active" id="sc-expected" onclick="setScenario('expected')">
+      <div class="sc-hd"><span class="sc-label">Expected</span><span class="chip blue">5–15x ROI</span></div>
+      <div class="sc-desc">Solid inclusion gains with improved funnel conversion.</div>
+      <div class="sc-gain">+15pp inclusion gain</div>
+    </button>
+    <button class="scenario-card" id="sc-aggressive" onclick="setScenario('aggressive')">
+      <div class="sc-hd"><span class="sc-label">Aggressive</span><span class="chip blue">15–30x ROI</span></div>
+      <div class="sc-desc">Maximum inclusion + full metric improvement applied.</div>
+      <div class="sc-gain">+25pp inclusion gain</div>
+    </button>
+  </div>
+
+  <div class="main-grid">
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <div class="card inputs-card anim d1">
+        <span class="sect-lbl">Demand &amp; Inclusion</span>
+        <div class="sl-row"><div class="sl-hd"><label class="sl-label">Monthly high-intent queries</label><span class="sl-val" id="v-monthlyQueries">1,000</span></div><input type="range" id="s-monthlyQueries" min="0" max="10000" step="50" value="1000" oninput="onInp('monthlyQueries',this.value)"/></div>
+        <div class="sl-row"><div class="sl-hd"><label class="sl-label">AI usage %</label><span class="sl-val" id="v-aiUsagePct">40%</span></div><input type="range" id="s-aiUsagePct" min="0" max="100" step="1" value="40" oninput="onInp('aiUsagePct',this.value)"/></div>
+        <div class="sl-row"><div class="sl-hd"><label class="sl-label">Current inclusion rate</label><span class="sl-val" id="v-currentInclusionPct">5%</span></div><input type="range" id="s-currentInclusionPct" min="0" max="100" step="1" value="5" oninput="onInp('currentInclusionPct',this.value)"/></div>
+        <div id="tgt-sl" class="sl-row"><div class="sl-hd"><label class="sl-label">Target inclusion rate</label><span class="sl-val" id="v-targetInclusionPct">20%</span></div><input type="range" id="s-targetInclusionPct" min="0" max="100" step="1" value="20" oninput="onInp('targetInclusionPct',this.value)"/></div>
+        <div id="tgt-ib" class="info-box" style="display:none"><p>Target inclusion: <strong id="ei-pct">—</strong> <small id="ei-det"></small></p></div>
+
+        <span class="sect-lbl">Conversion Funnel</span>
+        <div id="ctr-sl" class="sl-row"><div class="sl-hd"><label class="sl-label">Click / inquiry rate</label><span class="sl-val" id="v-clickToLeadPct">10%</span></div><input type="range" id="s-clickToLeadPct" min="0" max="100" step="1" value="10" oninput="onInp('clickToLeadPct',this.value)"/></div>
+        <div id="ctr-ib" class="info-box" style="display:none"><p>Effective CTR: <strong id="ei-ctr">—</strong></p></div>
+        <div class="sl-row"><div class="sl-hd"><label class="sl-label">Lead → opportunity rate</label><span class="sl-val" id="v-leadToOppPct">50%</span></div><input type="range" id="s-leadToOppPct" min="0" max="100" step="1" value="50" oninput="onInp('leadToOppPct',this.value)"/></div>
+        <div id="cls-sl" class="sl-row"><div class="sl-hd"><label class="sl-label">Close rate</label><span class="sl-val" id="v-closeRatePct">25%</span></div><input type="range" id="s-closeRatePct" min="0" max="100" step="1" value="25" oninput="onInp('closeRatePct',this.value)"/></div>
+        <div id="cls-ib" class="info-box" style="display:none"><p>Effective close rate: <strong id="ei-cls">—</strong></p></div>
+
+        <span class="sect-lbl">Deal Economics</span>
+        <div class="sl-row"><div class="sl-hd"><label class="sl-label">Average deal size</label><span class="sl-val" id="v-avgDealSize">$50,000</span></div><input type="range" id="s-avgDealSize" min="0" max="250000" step="1000" value="50000" oninput="onInp('avgDealSize',this.value)"/></div>
+        <div class="sl-row"><div class="sl-hd"><label class="sl-label">GEO investment</label><span class="sl-val" id="v-investment">$20,000</span></div><input type="range" id="s-investment" min="0" max="100000" step="1000" value="20000" oninput="onInp('investment',this.value)"/></div>
+      </div>
+
+      <div class="card anim d2">
+        <button class="mult-toggle" onclick="toggleMult()">
+          <div><div class="mt-title">Metric Improvement Multipliers</div><div class="mt-sub">Apply gains from fixing specific GEO metric issues</div></div>
+          <span class="mt-badge" id="mt-lbl">Show ▼</span>
+        </button>
+        <div class="mult-body" id="mult-body" style="display:none">
+          <div class="live-row">
+            <div><div class="lt-title">Use live pillar scores</div><div class="lt-sub">Auto-set from Acme Health GEO dashboard scores</div></div>
+            <button class="tog" id="live-tog" onclick="toggleLive()"><div class="tok"></div></button>
+          </div>
+          <div id="mult-sliders">
+            <div class="sl-row"><div class="sl-hd"><label class="sl-label">Visibility Gap fix → ↑ inclusion rate</label><span class="sl-val" id="v-visibilityGainPct">0pp</span></div><input type="range" id="s-visibilityGainPct" min="0" max="30" step="1" value="0" oninput="onMult('visibilityGainPct',this.value)"/></div>
+            <div class="sl-row"><div class="sl-hd"><label class="sl-label">Clarity / Compression fix → ↑ CTR</label><span class="sl-val" id="v-clarityGainPct">0pp</span></div><input type="range" id="s-clarityGainPct" min="0" max="30" step="1" value="0" oninput="onMult('clarityGainPct',this.value)"/></div>
+            <div class="sl-row"><div class="sl-hd"><label class="sl-label">Misclassification fix → ↑ inclusion + CTR</label><span class="sl-val" id="v-categoryGainPct">0pp</span></div><input type="range" id="s-categoryGainPct" min="0" max="30" step="1" value="0" oninput="onMult('categoryGainPct',this.value)"/></div>
+            <div class="sl-row"><div class="sl-hd"><label class="sl-label">Authority Gap fix → ↑ inclusion + close rate</label><span class="sl-val" id="v-authorityGainPct">0pp</span></div><input type="range" id="s-authorityGainPct" min="0" max="30" step="1" value="0" oninput="onMult('authorityGainPct',this.value)"/></div>
+            <div class="sl-row"><div class="sl-hd"><label class="sl-label">Comparative Absence fix → ↑ inclusion</label><span class="sl-val" id="v-comparativeGainPct">0pp</span></div><input type="range" id="s-comparativeGainPct" min="0" max="30" step="1" value="0" oninput="onMult('comparativeGainPct',this.value)"/></div>
+          </div>
+          <p class="mult-note" id="mult-note">Multipliers take effect in Scenario View — switch above to see their revenue impact.</p>
+          <table class="lmap">
+            <thead><tr><th>Multiplier</th><th>GEO Layer</th><th>Rate it lifts</th></tr></thead>
+            <tbody>
+              <tr><td>Visibility Gap fix</td><td><span class="tag purple">Positioning</span></td><td>↑ inclusion rate</td></tr>
+              <tr><td>Clarity / Compression fix</td><td><span class="tag amber">Selection</span></td><td>↑ CTR</td></tr>
+              <tr><td>Misclassification fix</td><td><span class="tag purple">Positioning</span></td><td>↑ inclusion + CTR</td></tr>
+              <tr><td>Authority Gap fix</td><td><span class="tag amber">Selection</span></td><td>↑ inclusion + close rate</td></tr>
+              <tr><td>Comparative Absence fix</td><td><span class="tag purple">Positioning</span></td><td>↑ inclusion</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="out-col anim d3">
+      <div class="card res-card">
+        <div class="res-title" id="res-title">Projected Results</div>
+        <div class="res-row"><span class="res-lbl">AI-influenced demand</span><span class="res-val" id="o-aiDemand">400</span></div>
+        <div class="res-row"><span class="res-lbl">Current captured demand</span><span class="res-val" id="o-currentCaptured">20</span></div>
+        <div class="res-row hi"><span class="res-lbl">Future captured demand</span><span class="res-val" id="o-futureCaptured">80</span></div>
+        <div class="res-row"><span class="res-lbl">Incremental demand</span><span class="res-val" id="o-incrementalDemand">+60</span></div>
+        <div class="res-row hi"><span class="res-lbl">Incremental leads</span><span class="res-val" id="o-leads">6.0</span></div>
+        <div class="eff-box" id="eff-box" style="display:none">
+          <div class="eff-row"><span>Effective inclusion</span><strong id="er-inc">—</strong></div>
+          <div class="eff-row"><span>Effective CTR</span><strong id="er-ctr">—</strong></div>
+          <div class="eff-row"><span>Effective close rate</span><strong id="er-cls">—</strong></div>
+        </div>
+      </div>
+
+      <div class="card rev-card">
+        <div class="rev-ey" id="rev-ey">Estimated Revenue Impact</div>
+        <div class="rev-amt" id="o-revenue">$375,000</div>
+        <div class="rev-per">per month</div>
+        <div class="rev-note" id="rev-note">Based on improved inclusion in AI-driven selection moments.</div>
+        <div class="roi-box">
+          <div class="roi-lbl">ROI multiple</div>
+          <div class="roi-val" id="o-roi">18.75x</div>
+          <div class="roi-band" id="roi-band" style="display:none"></div>
+        </div>
+      </div>
+
+      <div class="card as-card" id="as-panel" style="display:none">
+        <div class="as-title">All Scenario Bands</div>
+        <div id="as-rows"></div>
+      </div>
+
+      <div class="quote-card">
+        <p class="quote-text">"GEO ROI comes from increasing how often you are <strong>selected</strong> at the moment of decision — not just how often you are seen."</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const DEFAULTS={monthlyQueries:1000,aiUsagePct:40,currentInclusionPct:5,targetInclusionPct:20,clickToLeadPct:10,leadToOppPct:50,closeRatePct:25,avgDealSize:50000,investment:20000};
+const SCENARIOS=[
+  {key:'conservative',label:'Conservative',desc:'Modest inclusion improvement, minimal funnel lift.',gain:7,band:'2–5x',ov:{targetInclusionPct:12,clickToLeadPct:10,closeRatePct:25}},
+  {key:'expected',label:'Expected',desc:'Solid inclusion gains with improved funnel conversion.',gain:15,band:'5–15x',ov:{targetInclusionPct:20,clickToLeadPct:13,closeRatePct:28}},
+  {key:'aggressive',label:'Aggressive',desc:'Maximum inclusion + full metric improvement applied.',gain:25,band:'15–30x',ov:{targetInclusionPct:30,clickToLeadPct:18,closeRatePct:32}}
+];
+// Live scores from Acme Health seed data (client_metric_snapshots current)
+const LIVE_SCORES={'Visibility & Inclusion':58,'Representation Quality':63,'Category Accuracy':68,'Authority & Trust':45,'Competitive Positioning':48};
+let inp={...DEFAULTS},mult={visibilityGainPct:0,clarityGainPct:0,categoryGainPct:0,authorityGainPct:0,comparativeGainPct:0};
+let useLive=false,showMult=false,view='base',activeScen='expected';
+const p=n=>n/100,clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const fmt=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+const fmtN=n=>new Intl.NumberFormat('en-US').format(n);
+function getLive(){const g=s=>Math.round(((100-s)/100)*30);return{visibilityGainPct:g(LIVE_SCORES['Visibility & Inclusion']),clarityGainPct:g(LIVE_SCORES['Representation Quality']),categoryGainPct:g(LIVE_SCORES['Category Accuracy']),authorityGainPct:g(LIVE_SCORES['Authority & Trust']),comparativeGainPct:g(LIVE_SCORES['Competitive Positioning'])};}
+function applyMult(base,m){const ib=m.visibilityGainPct+m.categoryGainPct/2+m.authorityGainPct/2+m.comparativeGainPct,cb=m.clarityGainPct+m.categoryGainPct/2,clb=m.authorityGainPct/2;return{ei:clamp(base.targetInclusionPct+ib,0,100),ec:clamp(base.clickToLeadPct+cb,0,100),ek:clamp(base.closeRatePct+clb,0,100)};}
+function calc(i,ei,ec,ek){const ai=i.monthlyQueries*p(i.aiUsagePct),cc=ai*p(i.currentInclusionPct),fc=ai*p(ei),id=fc-cc,ld=id*p(ec),rv=ld*p(i.leadToOppPct)*p(ek)*i.avgDealSize,rm=i.investment>0?rv/i.investment:0;return{ai,cc,fc,id,ld,rv,rm};}
+function show(id,v){document.getElementById(id).style.display=v?'':'none';}
+function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v;}
+function render(){
+  const am=useLive?getLive():mult;
+  const sd=SCENARIOS.find(s=>s.key===activeScen);
+  const si={...inp,...sd.ov};
+  const se=applyMult(si,am);
+  const isSc=view==='scenario';
+  const di=isSc?se.ei:inp.targetInclusionPct,dc=isSc?se.ec:inp.clickToLeadPct,dk=isSc?se.ek:inp.closeRatePct;
+  const di2=isSc?si:inp;
+  const r=calc(di2,di,dc,dk);
+  setText('o-aiDemand',fmtN(Math.round(r.ai)));
+  setText('o-currentCaptured',fmtN(Math.round(r.cc)));
+  setText('o-futureCaptured',fmtN(Math.round(r.fc)));
+  setText('o-incrementalDemand','+'+fmtN(Math.round(r.id)));
+  setText('o-leads',r.ld.toFixed(1));
+  setText('res-title',isSc?sd.label+' Scenario':'Projected Results');
+  setText('o-revenue',fmt(r.rv));
+  setText('o-roi',r.rm.toFixed(2)+'x');
+  setText('rev-ey',isSc?'Scenario Revenue Impact':'Estimated Revenue Impact');
+  setText('rev-note',isSc?'Based on improved AI inclusion under the '+sd.label.toLowerCase()+' scenario.':'Based on improved inclusion in AI-driven selection moments.');
+  const rb=document.getElementById('roi-band');
+  if(isSc){rb.textContent='Expected band: '+sd.band;rb.style.display='';}else{rb.style.display='none';}
+  show('eff-box',isSc);
+  if(isSc){setText('er-inc',di.toFixed(1)+'%');setText('er-ctr',dc.toFixed(1)+'%');setText('er-cls',dk.toFixed(1)+'%');}
+  show('tgt-sl',!isSc);show('tgt-ib',isSc);show('ctr-sl',!isSc);show('ctr-ib',isSc);show('cls-sl',!isSc);show('cls-ib',isSc);
+  if(isSc){setText('ei-pct',di.toFixed(1)+'%');setText('ei-det','('+sd.ov.targetInclusionPct+'% base + multiplier boosts)');setText('ei-ctr',dc.toFixed(1)+'%');setText('ei-cls',dk.toFixed(1)+'%');}
+  show('as-panel',isSc);
+  if(isSc){document.getElementById('as-rows').innerHTML=SCENARIOS.map(s=>{const xi={...inp,...s.ov},xe=applyMult(xi,am),xr=calc(xi,xe.ei,xe.ec,xe.ek);return`<button class="as-row ${s.key===activeScen?'active':''}" onclick="setScenario('${s.key}')"><div><div class="as-name">${s.label}</div><div class="as-band">${s.band} ROI</div></div><div><div class="as-rev">${fmt(xr.rv)}/mo</div><div class="as-mult">${xr.rm.toFixed(1)}x</div></div></button>`;}).join('');}
+  setText('mult-note','');
+  if(!isSc&&showMult){const n=document.getElementById('mult-note');if(n)n.textContent='Multipliers take effect in Scenario View — switch above to see their revenue impact.';}
+  // Slider value labels
+  [['monthlyQueries',fmtN(inp.monthlyQueries)],['aiUsagePct',inp.aiUsagePct+'%'],['currentInclusionPct',inp.currentInclusionPct+'%'],['targetInclusionPct',inp.targetInclusionPct+'%'],['clickToLeadPct',inp.clickToLeadPct+'%'],['leadToOppPct',inp.leadToOppPct+'%'],['closeRatePct',inp.closeRatePct+'%'],['avgDealSize',fmt(inp.avgDealSize)],['investment',fmt(inp.investment)]].forEach(([k,v])=>setText('v-'+k,v));
+  const mv=useLive?getLive():mult;
+  Object.entries(mv).forEach(([k,v])=>{setText('v-'+k,v+'pp');const sl=document.getElementById('s-'+k);if(sl){sl.value=v;sl.classList.toggle('muted',useLive);}});
+  document.getElementById('mult-sliders').style.opacity=useLive?'0.5':'1';
+  document.getElementById('mult-sliders').style.pointerEvents=useLive?'none':'';
+}
+function onInp(k,v){inp[k]=Number(v);render();}
+function onMult(k,v){if(useLive)return;mult[k]=Number(v);render();}
+function setView(v){view=v;document.getElementById('btn-base').classList.toggle('active',v==='base');document.getElementById('btn-scenario').classList.toggle('active',v==='scenario');document.getElementById('scenario-grid').style.display=v==='scenario'?'grid':'none';render();}
+function setScenario(k){activeScen=k;SCENARIOS.forEach(s=>document.getElementById('sc-'+s.key).classList.toggle('active',s.key===k));render();}
+function toggleMult(){showMult=!showMult;document.getElementById('mult-body').style.display=showMult?'block':'none';document.getElementById('mt-lbl').textContent=showMult?'Hide ▲':'Show ▼';}
+function toggleLive(){useLive=!useLive;document.getElementById('live-tog').classList.toggle('on',useLive);render();}
+render();
+</script>
+</body>
+</html>
