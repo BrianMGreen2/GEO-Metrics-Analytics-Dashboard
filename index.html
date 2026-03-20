@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GEO Reporting System — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:#0f172a;--ink-muted:#475569;--ink-faint:#94a3b8;
+  --bg-page:#eef2f7;--bg-card:#ffffff;--border:#e2e8f0;
+  --brand:#1d4ed8;--brand-lt:#eff6ff;--brand-mid:#bfdbfe;
+  --success:#15803d;--success-bg:#f0fdf4;
+  --shadow:0 1px 3px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.06);
+  --shadow-lg:0 8px 32px rgba(15,23,42,.12);
+  --r-lg:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:640px;width:100%;text-align:center}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px}
+.title{font-size:32px;font-weight:700;color:var(--ink);line-height:1.15;margin-bottom:12px}
+.title span{color:var(--brand)}
+.subtitle{font-size:15px;color:var(--ink-muted);max-width:480px;margin:0 auto 40px;line-height:1.6}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:36px}
+@media(max-width:480px){.cards{grid-template-columns:1fr}}
+.demo-card{display:block;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 22px;text-decoration:none;text-align:left;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s,border-color .15s}
+.demo-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--brand-mid)}
+.card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.card-icon.blue{background:var(--brand-lt)}
+.card-icon.green{background:var(--success-bg)}
+.card-icon svg{width:18px;height:18px}
+.card-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.card-label.blue{color:var(--brand)}
+.card-label.green{color:var(--success)}
+.card-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px}
+.card-desc{font-size:12px;color:var(--ink-muted);line-height:1.5}
+.footer-note{font-size:12px;color:var(--ink-faint);line-height:1.6}
+.footer-note strong{color:var(--ink-muted);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">White-label starter</p>
+  <h1 class="title">GEO <span>Reporting System</span></h1>
+  <p class="subtitle">Interactive demos for the Generative Engine Optimization dashboard and ROI calculator. Select a demo below.</p>
+
+  <div class="cards">
+    <a class="demo-card" href="/geo-dashboard-demo.html">
+      <div class="card-icon blue">
+        <svg viewBox="0 0 20 20" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="6" height="6" rx="1"/>
+          <rect x="11" y="3" width="6" height="6" rx="1"/>
+          <rect x="3" y="11" width="6" height="6" rx="1"/>
+          <rect x="11" y="11" width="6" height="6" rx="1"/>
+        </svg>
+      </div>
+      <div class="card-label blue">Dashboard</div>
+      <div class="card-title">AI Performance Insights</div>
+      <div class="card-desc">8-pillar GEO metrics, prompt run history, client switcher, and diagnostic observations.</div>
+    </a>
+
+    <a class="demo-card" href="/geo-roi-calculator.html">
+      <div class="card-icon green">
+        <svg viewBox="0 0 20 20" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round">
+          <path d="M4 14l4-4 3 3 5-6"/>
+          <path d="M14 7h3v3"/>
+        </svg>
+      </div>
+      <div class="card-label green">ROI Calculator</div>
+      <div class="card-title">Revenue Modeling</div>
+      <div class="card-desc">Model AI inclusion gains against pipeline and revenue with scenario presets and metric multipliers.</div>
+    </a>
+  </div>
+
+  <p class="footer-note"><strong>GEO Reporting System</strong> — Generative Engine Optimization reporting for agencies.</p>
+</div>
+</body>
+</html>
