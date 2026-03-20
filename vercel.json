@@ -1,12 +1,4 @@
 {
-  "framework": null
+  "framework": null,
+  "outputDirectory": "."
 }
-```
-
-That tells Vercel "this is not a framework project, just serve the files." Your public repo structure would then be:
-```
-/ (public repo root)
-  vercel.json
-  README.md
-  geo-dashboard-demo.html
-  geo-roi-calculator.html
