@@ -438,10 +438,39 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink)
 
   <!-- ══ OBSERVATIONS VIEW ══ -->
   <div id="view-observations" style="display:none">
-    <div class="card obs-card anim">
-      <div class="section-title" id="obs-title"></div>
-      <div id="obs-list"></div>
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+      <div>
+        <div class="section-title" id="obs-title" style="margin-bottom:3px"></div>
+        <div style="font-size:13px;color:var(--ink-muted)" id="obs-sub"></div>
+      </div>
+      <div class="switcher">
+        <button class="sw-btn active" id="rf-all" onclick="filterRecs('all')">All</button>
+        <button class="sw-btn" id="rf-immediate" onclick="filterRecs('immediate')">Immediate</button>
+        <button class="sw-btn" id="rf-short" onclick="filterRecs('short')">Short-term</button>
+        <button class="sw-btn" id="rf-strategic" onclick="filterRecs('strategic')">Strategic</button>
+      </div>
     </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted)"><span style="width:10px;height:10px;border-radius:50%;background:var(--danger);flex-shrink:0"></span>Immediate — unblock now</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted)"><span style="width:10px;height:10px;border-radius:50%;background:var(--warning);flex-shrink:0"></span>Short-term — 30–90 days</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted)"><span style="width:10px;height:10px;border-radius:50%;background:var(--brand);flex-shrink:0"></span>Strategic — 90+ days</div>
+    </div>
+
+    <div id="obs-list"></div>
+
+    <div class="card" style="padding:18px 20px;margin-top:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:700;color:var(--ink)">Projected ROI Impact if Actioned</div>
+        <span class="chip blue">Estimated</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="roi-impact-row"></div>
+      <div style="margin-top:14px;padding:12px 14px;background:var(--bg-subtle);border-radius:var(--r-sm);border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--ink-muted);font-style:italic" id="roi-impact-note"></div>
+      </div>
+    </div>
+
   </div>
 
 </main>
@@ -700,20 +729,253 @@ function renderRuns(cid) {
   }).join('');
 }
 
+// ── Recommendation engine ────────────────────────────────────────────────────
+
+const RECS = {
+  acme: [
+    {
+      id:'a1', priority:'immediate', layer:1, pillar:'Identity Clarity',
+      issue:'Entity not resolved', serviceArea:'AI Enablement',
+      finding:'No single stable identity across website, LinkedIn, and directory listings. AI resolves this client inconsistently across models.',
+      action:'Consolidate brand name, founding date, service category, and geography into one canonical description and replicate across all authoritative sources.',
+      roiLever:'inclusion rate', effort:'medium', who:'3WM',
+      layerTag:'Entity Hardening', layerColor:'teal'
+    },
+    {
+      id:'a2', priority:'immediate', layer:1, pillar:'Signal Cohesion',
+      issue:'Signal fragmentation', serviceArea:'AI Enablement',
+      finding:'Evidence of expertise exists across sources but is not connected into one coherent entity signal. AI cannot synthesise a confident picture.',
+      action:'Build a signal reinforcement plan: consistent claims across owned, earned, and third-party sources. Prioritise 5–8 high-authority external placements.',
+      roiLever:'inclusion rate', effort:'medium', who:'3WM',
+      layerTag:'Entity Hardening', layerColor:'teal'
+    },
+    {
+      id:'a3', priority:'immediate', layer:2, pillar:'Visibility & Inclusion',
+      issue:'Comparative absence', serviceArea:'Measurement',
+      finding:'Client is absent from 88% of shortlist-style prompts despite being category-relevant. Scored high-severity in prompt runs.',
+      action:'Add dedicated "when to choose us" and "best X in Y" structured content blocks. Ensure these are crawlable and linkable.',
+      roiLever:'inclusion rate', effort:'fast', who:'Client / 3WM',
+      layerTag:'Positioning Accuracy', layerColor:'purple'
+    },
+    {
+      id:'a4', priority:'short', layer:2, pillar:'Visibility & Inclusion',
+      issue:'No comparative framing', serviceArea:'Content Strategy',
+      finding:'Content does not position the client against alternatives. AI cannot evaluate the client in comparison queries.',
+      action:'Create explicit comparison content: "X vs Competitor", "Why choose us for Y", structured with decision criteria and named use cases.',
+      roiLever:'inclusion rate + CTR', effort:'fast', who:'Client / 3WM',
+      layerTag:'Positioning Accuracy', layerColor:'purple'
+    },
+    {
+      id:'a5', priority:'short', layer:2, pillar:'Category Accuracy',
+      issue:'Missing decision inputs', serviceArea:'Content Strategy',
+      finding:'No clear geography, use case, or buyer context in content. AI defaults to a generic category classification.',
+      action:'Add explicit context fields to key pages: location served, ideal client profile, primary use case, and industry vertical.',
+      roiLever:'inclusion rate', effort:'fast', who:'Client',
+      layerTag:'Positioning Accuracy', layerColor:'purple'
+    },
+    {
+      id:'a6', priority:'short', layer:3, pillar:'Authority & Trust',
+      issue:'Authority gap', serviceArea:'Measurement',
+      finding:'Claims are not backed by external corroboration. Selection confidence score is 68 — known but not strongly enough recommended.',
+      action:'Add advisory snapshots, executive quotes, case study summaries, and third-party press mentions. Prioritise sources AI models cite frequently.',
+      roiLever:'close rate + inclusion rate', effort:'medium', who:'3WM',
+      layerTag:'Selection Confidence', layerColor:'amber'
+    },
+    {
+      id:'a7', priority:'short', layer:3, pillar:'Representation Quality',
+      issue:'Compression failure + hedging', serviceArea:'Measurement',
+      finding:'Compression failure score 66, hedging score 71. Key attributes are dropped or qualified when AI summarises the client.',
+      action:'Restructure key pages with extractable fact blocks: who, what, where, for whom, why different — each as a standalone, quotable sentence.',
+      roiLever:'CTR', effort:'fast', who:'Client / 3WM',
+      layerTag:'Selection Confidence', layerColor:'amber'
+    },
+    {
+      id:'a8', priority:'strategic', layer:2, pillar:'Source Dependence',
+      issue:'Source dependence', serviceArea:'AI Enablement',
+      finding:'AI knowledge is concentrated in 1–2 sources. Visibility is fragile if either drops from AI training sets.',
+      action:'Diversify presence across 8+ authoritative sources: industry directories, publications, association profiles, and partner sites.',
+      roiLever:'inclusion rate', effort:'slow', who:'3WM',
+      layerTag:'Positioning Accuracy', layerColor:'purple'
+    },
+    {
+      id:'a9', priority:'strategic', layer:3, pillar:'Competitive Positioning',
+      issue:'No selection justification', serviceArea:'AI Enablement',
+      finding:'No clear evidence structure to support AI selection over competitors. Client is present but not preferred.',
+      action:'Build a structured differentiation layer: proprietary methodology, outcome data, and third-party validation that AI can cite as selection rationale.',
+      roiLever:'close rate', effort:'slow', who:'3WM',
+      layerTag:'Selection Confidence', layerColor:'amber'
+    }
+  ],
+  northstar: [
+    {
+      id:'n1', priority:'immediate', layer:2, pillar:'Competitive Positioning',
+      issue:'Comparative absence in choice queries', serviceArea:'Measurement',
+      finding:'Client appears in category prompts but is excluded from "who should I choose" and "best" queries — the highest-intent decision moments.',
+      action:'Strengthen "when to choose us" language and add explicit comparison content targeting selection-intent queries.',
+      roiLever:'inclusion rate + CTR', effort:'fast', who:'Client / 3WM',
+      layerTag:'Positioning Accuracy', layerColor:'purple'
+    },
+    {
+      id:'n2', priority:'immediate', layer:3, pillar:'Authority & Trust',
+      issue:'Authority gap + confidence threshold', serviceArea:'Measurement',
+      finding:'Authority gap score 33, selection confidence 27. Client is recognised but AI does not confidently recommend it over Competitor X.',
+      action:'Build external validation: G2 reviews, analyst mentions, case studies with named outcomes. Focus on sources AI models weight highly in this category.',
+      roiLever:'close rate + inclusion rate', effort:'medium', who:'3WM',
+      layerTag:'Selection Confidence', layerColor:'amber'
+    },
+    {
+      id:'n3', priority:'short', layer:2, pillar:'Visibility & Inclusion',
+      issue:'No comparative structure', serviceArea:'AI Enablement',
+      finding:'Content does not give the AI a structure to evaluate this client against Competitor X and Z in side-by-side decision queries.',
+      action:'Create structured comparison pages and decision-criteria content that explicitly addresses the most common competitor comparisons.',
+      roiLever:'inclusion rate', effort:'medium', who:'3WM',
+      layerTag:'Positioning Accuracy', layerColor:'purple'
+    },
+    {
+      id:'n4', priority:'short', layer:3, pillar:'Representation Quality',
+      issue:'Compression failure', serviceArea:'Content Strategy',
+      finding:'Compression failure score 29 — moderate. Some key differentiators are lost when AI reduces content to a short answer.',
+      action:'Restructure product pages with extractable one-sentence fact blocks for each key differentiator and use case.',
+      roiLever:'CTR', effort:'fast', who:'Client',
+      layerTag:'Selection Confidence', layerColor:'amber'
+    },
+    {
+      id:'n5', priority:'strategic', layer:2, pillar:'Source Dependence',
+      issue:'Source dependence risk', serviceArea:'AI Enablement',
+      finding:'Source dependence score 57 — acceptable but concentrated in G2 and the website. Platform resilience not yet measured.',
+      action:'Expand authoritative presence to analyst sites, vertical publications, and integration partner pages.',
+      roiLever:'inclusion rate', effort:'slow', who:'3WM',
+      layerTag:'Positioning Accuracy', layerColor:'purple'
+    },
+    {
+      id:'n6', priority:'strategic', layer:3, pillar:'Competitive Positioning',
+      issue:'No selection justification', serviceArea:'AI Enablement',
+      finding:'No structured rationale for why a mid-market team should choose this client over alternatives — AI defers to competitors with stronger evidence.',
+      action:'Build a differentiation evidence layer: proprietary benchmarks, integration depth data, and customer outcome proof points.',
+      roiLever:'close rate', effort:'slow', who:'3WM',
+      layerTag:'Selection Confidence', layerColor:'amber'
+    }
+  ]
+};
+
+const PRIORITY_META = {
+  immediate: { label:'Immediate', color:'var(--danger)', bg:'var(--danger-bg)', desc:'Unblock now — these are blocking downstream improvements', dot:'red' },
+  short:     { label:'Short-term (30–90 days)', color:'var(--warning)', bg:'var(--warning-bg)', desc:'High ROI lever — action once immediate fixes are underway', dot:'orange' },
+  strategic: { label:'Strategic (90+ days)', color:'var(--brand)', bg:'var(--brand-lt)', desc:'Structural work that compounds the earlier gains', dot:'blue' }
+};
+
+const EFFORT_META = {
+  fast:   { label:'Quick win', chipClass:'green' },
+  medium: { label:'Moderate effort', chipClass:'orange' },
+  slow:   { label:'Longer engagement', chipClass:'blue' }
+};
+
+const LAYER_COLORS = { teal:'var(--teal)', purple:'var(--purple)', amber:'var(--amber)' };
+const LAYER_BG     = { teal:'var(--teal-bg)', purple:'var(--purple-bg)', amber:'var(--amber-bg)' };
+
+let activeFilter = 'all';
+
+function filterRecs(f) {
+  activeFilter = f;
+  ['all','immediate','short','strategic'].forEach(k => {
+    document.getElementById('rf-' + k).classList.toggle('active', k === f);
+  });
+  renderObservations(activeClient);
+}
+
 function renderObservations(cid) {
   const c = DATA[cid];
-  setEl('obs-title', `Metric Observations — ${c.name} (${c.obs.length} findings)`);
-  document.getElementById('obs-list').innerHTML = c.obs.map(o => `
-    <div class="obs-item">
-      <div class="obs-hd">
-        <div>
-          <div class="obs-category">${o.cat} · ${o.name}</div>
+  const recs = RECS[cid] || [];
+  const filtered = activeFilter === 'all' ? recs : recs.filter(r => r.priority === activeFilter);
+
+  setEl('obs-title', `Action Plan — ${c.name}`);
+  setEl('obs-sub', `${recs.length} recommendations across ${[...new Set(recs.map(r=>r.priority))].length} priority bands · Ordered by impact and layer dependency`);
+
+  // Group by priority
+  const groups = { immediate:[], short:[], strategic:[] };
+  filtered.forEach(r => groups[r.priority].push(r));
+
+  let html = '';
+  ['immediate','short','strategic'].forEach(band => {
+    const items = groups[band];
+    if (!items.length) return;
+    const meta = PRIORITY_META[band];
+    html += `
+      <div style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="width:10px;height:10px;border-radius:50%;background:${meta.color};flex-shrink:0"></span>
+          <span style="font-size:12px;font-weight:700;color:var(--ink)">${meta.label}</span>
+          <span style="font-size:11px;color:var(--ink-faint)">— ${meta.desc}</span>
+          <span style="margin-left:auto;font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;background:${meta.bg};color:${meta.color}">${items.length} item${items.length>1?'s':''}</span>
         </div>
-        <span class="chip ${sevCol(o.sev)}">${o.sev}</span>
+        ${items.map((r,i) => recCard(r, i+1, band)).join('')}
+      </div>`;
+  });
+
+  document.getElementById('obs-list').innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--ink-faint);font-size:13px">No recommendations match this filter.</div>';
+
+  // ROI impact summary
+  const fmt = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+  const roiData = cid === 'acme'
+    ? { immediate: { rev:'$45k–$65k', mult:'4–7x', note:'Fixing entity resolution and comparative absence directly lifts inclusion rate from 12% toward 20%+, unlocking the majority of the estimated $75k–$130k monthly opportunity.' } }
+    : { immediate: { rev:'$18k–$32k', mult:'3–5x', note:'Addressing comparative absence and authority gap in choice queries is the primary revenue unlock — moves client from visible to selected in high-intent prompts.' } };
+
+  const roi = roiData['immediate'];
+  document.getElementById('roi-impact-row').innerHTML = `
+    <div style="padding:14px;border-radius:var(--r-md);background:var(--success-bg);border:1px solid #bbf7d0">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--success);margin-bottom:4px">Immediate actions</div>
+      <div style="font-size:22px;font-weight:700;color:var(--success)">${roi.rev}</div>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:2px">Est. monthly uplift</div>
+    </div>
+    <div style="padding:14px;border-radius:var(--r-md);background:var(--warning-bg);border:1px solid #fed7aa">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--warning);margin-bottom:4px">ROI multiple</div>
+      <div style="font-size:22px;font-weight:700;color:var(--warning)">${roi.mult}</div>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:2px">On GEO investment</div>
+    </div>
+    <div style="padding:14px;border-radius:var(--r-md);background:var(--brand-lt);border:1px solid var(--brand-mid)">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--brand);margin-bottom:4px">Primary lever</div>
+      <div style="font-size:14px;font-weight:700;color:var(--brand);line-height:1.3">Inclusion rate ↑</div>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:2px">Biggest ROI driver</div>
+    </div>`;
+
+  setEl('roi-impact-note', roi.note);
+}
+
+function recCard(r, i, band) {
+  const pm = PRIORITY_META[band];
+  const em = EFFORT_META[r.effort];
+  const layerColor = LAYER_COLORS[r.layerColor];
+  const layerBg = LAYER_BG[r.layerColor];
+  const whoColor = r.who.includes('3WM') ? 'color:var(--brand)' : 'color:var(--success)';
+  return `
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:10px;overflow:hidden">
+      <div style="display:flex;align-items:stretch">
+        <div style="width:4px;background:${pm.color};flex-shrink:0;border-radius:0"></div>
+        <div style="flex:1;padding:14px 16px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="font-size:11px;font-weight:700;color:var(--ink-faint)">#${i}</span>
+              <span style="font-size:13px;font-weight:700;color:var(--ink)">${r.issue}</span>
+              <span style="font-size:10px;font-weight:600;padding:1px 8px;border-radius:999px;background:${layerBg};color:${layerColor}">${r.layerTag}</span>
+              <span style="font-size:10px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--bg-subtle);color:var(--ink-muted);border:1px solid var(--border)">${r.pillar}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+              <span class="chip ${em.chipClass}">${em.label}</span>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--ink);line-height:1.5;margin-bottom:10px">${r.finding}</div>
+          <div style="display:flex;align-items:flex-start;gap:6px;padding:10px 12px;background:var(--bg-subtle);border-radius:var(--r-sm);border:1px solid var(--border)">
+            <span style="font-size:13px;font-weight:700;color:var(--brand);flex-shrink:0">→</span>
+            <span style="font-size:13px;color:var(--ink-muted);line-height:1.45">${r.action}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;margin-top:10px;flex-wrap:wrap">
+            <div style="font-size:11px;color:var(--ink-faint)">ROI lever: <strong style="color:var(--ink)">${r.roiLever}</strong></div>
+            <div style="font-size:11px;color:var(--ink-faint)">Service area: <strong style="color:var(--ink)">${r.serviceArea}</strong></div>
+            <div style="font-size:11px;color:var(--ink-faint)">Who: <strong style="${whoColor}">${r.who}</strong></div>
+          </div>
+        </div>
       </div>
-      <div class="obs-finding">${o.finding}</div>
-      <div class="obs-action">${o.action}</div>
-    </div>`).join('');
+    </div>`;
 }
 
 // ── State + Switching ─────────────────────────────────────────────────────────
