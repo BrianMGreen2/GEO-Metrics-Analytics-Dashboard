@@ -1,6 +1,6 @@
 # GEO Reporting System
 
-A white-label reporting product for agencies building **Generative Engine Optimization (GEO)** client dashboards and ROI models. Includes an executive performance dashboard, a live interactive ROI calculator, and a full 8-pillar metric framework.
+A white-label reporting product for agencies building **Generative Engine Optimization (GEO)** client dashboards, ROI models, and prioritized action plans. Includes an executive performance dashboard, a live interactive ROI calculator, a full 8-pillar metric framework, and a recommendation engine that maps diagnostic findings to client-ready next steps.
 
 ---
 
@@ -11,7 +11,14 @@ A white-label reporting product for agencies building **Generative Engine Optimi
 | AI Performance Dashboard | `/geo-dashboard-demo.html` |
 | GEO ROI Calculator | `/geo-roi-calculator.html` |
 
-The dashboard demo includes two clients (Acme Health and Northstar SaaS) with real seed data, a full 8-pillar detail view, prompt run history, and metric observations. The ROI calculator includes a base model, three scenario presets, and metric improvement multipliers tied to GEO pillar scores.
+The dashboard demo includes two clients (Acme Health and Northstar SaaS) with real seed data across four tabs:
+
+| Tab | What it shows |
+|---|---|
+| **Dashboard** | KPI row, visibility gap alert, diagnostic cards, trust signals, opportunity sidebar |
+| **8-Pillar Detail** | All eight pillars grouped by GEO layer with current scores and prior-week deltas |
+| **Prompt Runs** | Raw prompt-by-prompt data — model, inclusion status, score, competitors, sources |
+| **Action Plan** | Prioritized recommendations mapped to the three GEO layers, with ROI impact summary |
 
 ---
 
@@ -58,9 +65,53 @@ Each pillar maps to scored columns in `prompt_runs` and rolls up into `client_me
 
 ---
 
+## Action Plan & Recommendation Engine
+
+The Action Plan tab generates a prioritized roadmap from diagnostic findings. Each recommendation is scored across four dimensions to determine its priority band and sequencing.
+
+### Prioritization logic
+
+| Dimension | What it weighs |
+|---|---|
+| **Layer dependency** | Layer 1 issues always surface first — they block all downstream improvements |
+| **ROI lever** | Fixes that lift inclusion rate rank highest, followed by CTR, then close rate |
+| **Effort** | Quick wins surface before structural engagements of equal impact |
+| **Severity** | Critical and high-severity findings from `metric_observations` score up |
+
+### Priority bands
+
+| Band | Timeframe | What it contains |
+|---|---|---|
+| **Immediate** | Now | Blocking issues — entity resolution, signal fragmentation, comparative absence |
+| **Short-term** | 30–90 days | High-ROI content and authority fixes once the foundation is stable |
+| **Strategic** | 90+ days | Structural work — source diversification, differentiation evidence, selection justification |
+
+### Service areas
+
+Each recommendation is tagged to one of three service areas, which maps to who does the work:
+
+| Service Area | What we do | Typical owner |
+|---|---|---|
+| **Measurement** | Diagnose where the model breaks — error rates, compression failure, hedging, retrieval failure, disambiguation issues | 3WM |
+| **Content Strategy** | Fix where content fails the model — unresolved attributes, buried facts, missing decision inputs, lack of comparative framing | Client / 3WM |
+| **AI Enablement** | Fix where the business itself is unusable by the model — entity not resolved, no comparative structure, weak external validation, source dependence | 3WM |
+
+### Issues mapped to pillars
+
+**Entity Hardening** — Identity Clarity + Signal Cohesion
+- Disambiguation, entity drift, inconsistent statements, unresolved attributes, entity not resolved, ambiguity under compression, signal fragmentation, lack of repeat signals, weak external validation
+
+**Positioning Accuracy** — Category Accuracy + Visibility & Inclusion + Source Dependence
+- Category misclassification, over-generalization, missing decision inputs, context gaps, error rate, retrieval failure, comparative absence, buried facts, no comparative framing, no comparative structure, source dependence
+
+**Selection Confidence** — Authority & Trust + Representation Quality + Competitive Positioning
+- Authority gap, confidence threshold, no selection justification, compression failure, hedging, buried facts (also Visibility), comparative absence (also Visibility), no comparative framing (also Visibility)
+
+---
+
 ## ROI Calculator
 
-The calculator models how improvements across the three GEO layers translate to revenue.
+The calculator models how improvements across the three GEO layers translate to revenue. Metric multipliers connect directly to the recommendation priority bands — Immediate fixes lift inclusion rate, Short-term fixes lift CTR, Strategic fixes lift close rate.
 
 | Multiplier | GEO Layer | Rate it lifts |
 |---|---|---|
@@ -73,3 +124,12 @@ The calculator models how improvements across the three GEO layers translate to 
 Multipliers can be set manually via sliders, or auto-populated from live pillar scores. Scenario view (Conservative / Expected / Aggressive) shows all three outcomes simultaneously with ROI bands of 2–5x, 5–15x, and 15–30x.
 
 ---
+
+## Stack
+
+- **Next.js 14** (App Router)
+- **TypeScript** (strict mode)
+- **Tailwind CSS**
+- **Supabase** (`@supabase/supabase-js`) — Postgres + RLS
+- **Lucide React** icons
+- **Vercel** — deployment target
