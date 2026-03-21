@@ -383,11 +383,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink)
         </div>
 
         <div class="btn-row anim d5">
-          <button class="btn primary">
+          <button class="btn primary" onclick="switchTab('runs')">
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h12M4 10h12M4 14h7"/></svg>
             View Diagnostic Report
           </button>
-          <button class="btn success">
+          <button class="btn success" onclick="switchTab('observations')">
             Recommended Action Plan
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="5,10 15,10 11,6"/><polyline points="11,14 15,10"/></svg>
           </button>
@@ -423,8 +423,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink)
     <div class="p-section"><span class="p-section-lbl purple">Positioning Accuracy</span><div class="p-row" id="pl-l2a"></div><div class="p-row" id="pl-l2b"></div></div>
     <div class="p-section"><span class="p-section-lbl amber">Selection Confidence</span><div class="p-row" id="pl-l3a"></div><div class="p-row" id="pl-l3b"></div></div>
     <div class="btn-row anim">
-      <button class="btn primary"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h12M4 10h12M4 14h7"/></svg>View Diagnostic Report</button>
-      <button class="btn success">Recommended Action Plan<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="5,10 15,10 11,6"/><polyline points="11,14 15,10"/></svg></button>
+      <button class="btn primary" onclick="switchTab('runs')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h12M4 10h12M4 14h7"/></svg>View Diagnostic Report</button>
+      <button class="btn success" onclick="switchTab('observations')">Recommended Action Plan<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="5,10 15,10 11,6"/><polyline points="11,14 15,10"/></svg></button>
     </div>
   </div>
 
