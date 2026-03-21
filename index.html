@@ -12,28 +12,31 @@
   --bg-page:#eef2f7;--bg-card:#ffffff;--border:#e2e8f0;
   --brand:#1d4ed8;--brand-lt:#eff6ff;--brand-mid:#bfdbfe;
   --success:#15803d;--success-bg:#f0fdf4;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;
   --shadow:0 1px 3px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.06);
   --shadow-lg:0 8px 32px rgba(15,23,42,.12);
   --r-lg:16px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;-webkit-font-smoothing:antialiased}
-.wrap{max-width:640px;width:100%;text-align:center}
+.wrap{max-width:900px;width:100%;text-align:center}
 .eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:12px}
 .title{font-size:32px;font-weight:700;color:var(--ink);line-height:1.15;margin-bottom:12px}
 .title span{color:var(--brand)}
 .subtitle{font-size:15px;color:var(--ink-muted);max-width:480px;margin:0 auto 40px;line-height:1.6}
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:36px}
-@media(max-width:480px){.cards{grid-template-columns:1fr}}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px}
+@media(max-width:700px){.cards{grid-template-columns:1fr}}
 .demo-card{display:block;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 22px;text-decoration:none;text-align:left;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s,border-color .15s}
 .demo-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--brand-mid)}
 .card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
 .card-icon.blue{background:var(--brand-lt)}
 .card-icon.green{background:var(--success-bg)}
+.card-icon.purple{background:var(--purple-bg)}
 .card-icon svg{width:18px;height:18px}
 .card-label{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
 .card-label.blue{color:var(--brand)}
 .card-label.green{color:var(--success)}
+.card-label.purple{color:var(--purple)}
 .card-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:5px}
 .card-desc{font-size:12px;color:var(--ink-muted);line-height:1.5}
 .footer-note{font-size:12px;color:var(--ink-faint);line-height:1.6}
@@ -44,7 +47,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink)
 <div class="wrap">
   <p class="eyebrow">White-label starter</p>
   <h1 class="title">GEO <span>Reporting System</span></h1>
-  <p class="subtitle">Interactive demos for the Generative Engine Optimization dashboard and ROI calculator. Select a demo below.</p>
+  <p class="subtitle">Interactive demos for the Generative Engine Optimization dashboard, ROI calculator, and service framework. Select a demo below.</p>
 
   <div class="cards">
     <a class="demo-card" href="/geo-dashboard-demo.html">
@@ -71,6 +74,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink)
       <div class="card-label green">ROI Calculator</div>
       <div class="card-title">Revenue Modeling</div>
       <div class="card-desc">Model AI inclusion gains against pipeline and revenue with scenario presets and metric multipliers.</div>
+    </a>
+    <a class="demo-card" href="/geo-service-framework-map.html">
+      <div class="card-icon purple">
+        <svg viewBox="0 0 20 20" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="3" width="5" height="5" rx="1"/>
+          <rect x="12" y="3" width="5" height="5" rx="1"/>
+          <rect x="3" y="12" width="5" height="5" rx="1"/>
+          <line x1="12" y1="14.5" x2="17" y2="14.5"/>
+          <line x1="14.5" y1="12" x2="14.5" y2="17"/>
+        </svg>
+      </div>
+      <div class="card-label purple">Service Framework</div>
+      <div class="card-title">GEO Service Map</div>
+      <div class="card-desc">Every issue we measure and fix, mapped to the three GEO layers, eight pillars, ROI lever, and owner.</div>
     </a>
   </div>
 
