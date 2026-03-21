@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>GEO Service Framework Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --ink:#0f172a;--ink-muted:#475569;--ink-faint:#94a3b8;
+  --bg-page:#eef2f7;--bg-card:#ffffff;--bg-subtle:#f8fafc;--border:#e2e8f0;
+  --brand:#1d4ed8;--brand-lt:#eff6ff;--brand-mid:#bfdbfe;
+  --success:#15803d;--success-bg:#f0fdf4;
+  --warning:#c2410c;--warning-bg:#fff7ed;
+  --danger:#dc2626;--danger-bg:#fef2f2;
+  --teal:#0f766e;--teal-bg:#f0fdfa;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;
+  --amber:#b45309;--amber-bg:#fffbeb;
+  --shadow:0 1px 3px rgba(15,23,42,.05),0 4px 16px rgba(15,23,42,.06);
+  --r-sm:8px;--r-md:12px;--r-lg:16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg-page);color:var(--ink);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;padding:40px 28px 60px}
+
+.page{max-width:1200px;margin:0 auto}
+
+/* HEADER */
+.page-eyebrow{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px}
+.page-title{font-size:26px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.page-title span{color:var(--brand)}
+.page-sub{font-size:14px;color:var(--ink-muted);max-width:680px;margin-bottom:28px}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.filter-label{font-size:12px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.1em;margin-right:4px}
+.fb-btn{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:5px 13px;border-radius:999px;border:1px solid var(--border);background:var(--bg-card);color:var(--ink-muted);cursor:pointer;transition:all .15s}
+.fb-btn:hover{border-color:var(--brand-mid);color:var(--brand)}
+.fb-btn.active{background:var(--brand);color:#fff;border-color:var(--brand);font-weight:600}
+.fb-btn.teal.active{background:var(--teal);border-color:var(--teal)}
+.fb-btn.purple.active{background:var(--purple);border-color:var(--purple)}
+.fb-btn.amber.active{background:var(--amber);border-color:var(--amber)}
+
+/* TABLE WRAPPER */
+.table-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--bg-subtle);border-bottom:2px solid var(--border)}
+thead th{padding:11px 14px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);white-space:nowrap}
+thead th:first-child{padding-left:18px}
+
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg-subtle)}
+tbody tr.hidden{display:none}
+
+td{padding:11px 14px;vertical-align:top}
+td:first-child{padding-left:18px}
+
+/* LAYER SECTION ROWS */
+tr.layer-row td{padding:8px 14px 6px 18px;background:var(--bg-subtle);border-bottom:1px solid var(--border)}
+.layer-row-inner{display:flex;align-items:center;gap:8px}
+.layer-pill{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 10px;border-radius:999px}
+.layer-pill.teal{background:#9FE1CB;color:#085041}
+.layer-pill.purple{background:#CECBF6;color:#26215C}
+.layer-pill.amber{background:#FAC775;color:#412402}
+.layer-row-title{font-size:12px;font-weight:600;color:var(--ink-muted)}
+
+/* CELLS */
+.issue-name{font-size:13px;font-weight:600;color:var(--ink)}
+.issue-what{font-size:12px;color:var(--ink-muted);margin-top:2px;line-height:1.4}
+
+.pillar-tag{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;display:inline-block}
+.pillar-tag.teal{background:var(--teal-bg);color:var(--teal)}
+.pillar-tag.purple{background:var(--purple-bg);color:var(--purple)}
+.pillar-tag.amber{background:var(--amber-bg);color:var(--amber)}
+
+.src-chip{font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;display:inline-block;white-space:nowrap}
+.src-chip.m{background:var(--teal-bg);color:var(--teal)}
+.src-chip.c{background:var(--purple-bg);color:var(--purple)}
+.src-chip.a{background:var(--amber-bg);color:var(--amber)}
+
+.roi-chip{font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;display:inline-block;white-space:nowrap}
+.roi-chip.inc{background:var(--danger-bg);color:var(--danger)}
+.roi-chip.ctr{background:var(--warning-bg);color:var(--warning)}
+.roi-chip.cls{background:var(--brand-lt);color:var(--brand)}
+.roi-chip.inc-ctr{background:#fef3c7;color:#92400e}
+
+.who-chip{font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;display:inline-block;white-space:nowrap}
+.who-chip.agency{background:var(--brand-lt);color:var(--brand)}
+.who-chip.client{background:var(--success-bg);color:var(--success)}
+.who-chip.both{background:var(--bg-subtle);color:var(--ink-muted);border:1px solid var(--border)}
+
+.also-tag{font-size:10px;color:var(--ink-faint);margin-left:4px;font-style:italic}
+
+/* LEGEND */
+.legend{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px}
+.legend-group{display:flex;flex-direction:column;gap:5px}
+.legend-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);margin-bottom:2px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-muted)}
+
+/* COUNT BADGE */
+.count-badge{font-size:11px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--bg-subtle);color:var(--ink-muted);border:1px solid var(--border);margin-left:auto}
+
+@media(max-width:768px){
+  .table-wrap{overflow-x:auto}
+  table{min-width:700px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <p class="page-eyebrow">GEO service framework</p>
+  <h1 class="page-title">Service Framework <span>Map</span></h1>
+  <p class="page-sub">Every issue we measure and fix, mapped to the three GEO layers, eight metric pillars, service area, ROI lever, and recommended owner. Filter by layer, service area, or ROI lever.</p>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar" id="layer-bar">
+    <span class="filter-label">Layer</span>
+    <button class="fb-btn active" onclick="filter('layer','all')">All layers</button>
+    <button class="fb-btn teal" onclick="filter('layer','Entity Hardening')">Entity Hardening</button>
+    <button class="fb-btn purple" onclick="filter('layer','Positioning Accuracy')">Positioning Accuracy</button>
+    <button class="fb-btn amber" onclick="filter('layer','Selection Confidence')">Selection Confidence</button>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Service</span>
+    <button class="fb-btn active" id="svc-all" onclick="filter('service','all')">All</button>
+    <button class="fb-btn" id="svc-m" onclick="filter('service','Measurement')">Measurement</button>
+    <button class="fb-btn" id="svc-c" onclick="filter('service','Content Strategy')">Content Strategy</button>
+    <button class="fb-btn" id="svc-a" onclick="filter('service','AI Enablement')">AI Enablement</button>
+
+    <span class="filter-label" style="margin-left:12px">ROI lever</span>
+    <button class="fb-btn active" id="roi-all" onclick="filter('roi','all')">All</button>
+    <button class="fb-btn" id="roi-inc" onclick="filter('roi','inclusion')">↑ Inclusion</button>
+    <button class="fb-btn" id="roi-ctr" onclick="filter('roi','ctr')">↑ CTR</button>
+    <button class="fb-btn" id="roi-cls" onclick="filter('roi','close')">↑ Close rate</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table id="framework-table">
+      <thead>
+        <tr>
+          <th style="width:200px">Issue / Service</th>
+          <th style="width:260px">What it means</th>
+          <th style="width:140px">Pillar</th>
+          <th style="width:130px">Service area</th>
+          <th style="width:120px">ROI lever</th>
+          <th style="width:110px">Owner</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend" style="margin-top:20px">
+    <div class="legend-group">
+      <div class="legend-title">Service area</div>
+      <div class="legend-item"><span class="src-chip m">Measurement</span> We diagnose where the model breaks</div>
+      <div class="legend-item"><span class="src-chip c">Content Strategy</span> We fix where content fails the model</div>
+      <div class="legend-item"><span class="src-chip a">AI Enablement</span> We fix where the business is unusable by the model</div>
+    </div>
+    <div class="legend-group">
+      <div class="legend-title">ROI lever</div>
+      <div class="legend-item"><span class="roi-chip inc">↑ Inclusion</span> Highest revenue multiplier</div>
+      <div class="legend-item"><span class="roi-chip ctr">↑ CTR</span> Second-order multiplier</div>
+      <div class="legend-item"><span class="roi-chip cls">↑ Close rate</span> Downstream multiplier</div>
+      <div class="legend-item"><span class="roi-chip inc-ctr">↑ Inclusion + CTR</span> Dual lever</div>
+    </div>
+    <div class="legend-group">
+      <div class="legend-title">Owner</div>
+      <div class="legend-item"><span class="who-chip agency">3WM</span> Agency-led engagement</div>
+      <div class="legend-item"><span class="who-chip client">Client</span> Client-executable</div>
+      <div class="legend-item"><span class="who-chip both">Client / 3WM</span> Collaborative</div>
+    </div>
+  </div>
+
+  <div style="margin-top:10px;font-size:12px;color:var(--ink-faint)" id="row-count"></div>
+
+</div>
+
+<script>
+const ROWS = [
+  // ── ENTITY HARDENING / Identity Clarity ──────────────────────────────────
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Identity Clarity', pillarColor:'teal',
+    issue:'Disambiguation', what:'AI cannot clearly resolve who you are',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Identity Clarity', pillarColor:'teal',
+    issue:'Entity drift', what:'Inconsistent descriptions across sources',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Identity Clarity', pillarColor:'teal',
+    issue:'Inconsistent statements', what:'Different versions of who you are across pages and platforms',
+    service:'Content Strategy', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'Client / 3WM', whoClass:'both' },
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Identity Clarity', pillarColor:'teal',
+    issue:'Unresolved attributes', what:'What you do, where, and for whom is not explicit',
+    service:'Content Strategy', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'Client', whoClass:'client' },
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Identity Clarity', pillarColor:'teal',
+    issue:'Entity not resolved', what:'No single, stable identity exists for the AI to anchor on',
+    service:'AI Enablement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Identity Clarity', pillarColor:'teal',
+    issue:'Ambiguity under compression', what:'Looks generic or multi-category when AI reduces to a short answer',
+    service:'AI Enablement', roiKey:'ctr', roi:'↑ CTR', roiClass:'ctr', who:'3WM', whoClass:'agency' },
+
+  // ── ENTITY HARDENING / Signal Cohesion ───────────────────────────────────
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Signal Cohesion', pillarColor:'teal',
+    issue:'Signal fragmentation', what:'Evidence exists but is not connected into one clear entity signal',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Signal Cohesion', pillarColor:'teal',
+    issue:'Lack of repeat signals', what:'Claims appear once, not reinforced elsewhere',
+    service:'Content Strategy', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'Client / 3WM', whoClass:'both' },
+  { layer:'Entity Hardening', layerColor:'teal', pillar:'Signal Cohesion', pillarColor:'teal',
+    issue:'Weak external validation', what:'Too reliant on owned sources; thin corroboration across third parties',
+    service:'AI Enablement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+
+  // ── POSITIONING ACCURACY / Category Accuracy ──────────────────────────────
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Category Accuracy', pillarColor:'purple',
+    issue:'Category misclassification', what:'Placed in the wrong bucket by the AI',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Category Accuracy', pillarColor:'purple',
+    issue:'Over-generalization', what:'Broad language leads the AI to a generic classification',
+    service:'Content Strategy', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'Client', whoClass:'client' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Category Accuracy', pillarColor:'purple',
+    issue:'Missing decision inputs', what:'No clear use case, geography, or context for selection',
+    service:'Content Strategy', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'Client', whoClass:'client' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Category Accuracy', pillarColor:'purple',
+    issue:'Context gaps', what:'Not tied to specific situations where client applies',
+    service:'AI Enablement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+
+  // ── POSITIONING ACCURACY / Visibility & Inclusion ─────────────────────────
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Visibility & Inclusion', pillarColor:'purple',
+    issue:'Error rate', what:'Should appear but doesn\'t, or a competitor shows up instead',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Visibility & Inclusion', pillarColor:'purple',
+    issue:'Retrieval failure', what:'Information exists but doesn\'t surface in AI answers',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Visibility & Inclusion', pillarColor:'purple',
+    issue:'Comparative absence', what:'Not used in "best / who should I choose" queries', also:'also Competitive Positioning',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Visibility & Inclusion', pillarColor:'purple',
+    issue:'Buried facts', what:'Key information is present but not extractable by the AI', also:'also Representation Quality',
+    service:'Content Strategy', roiKey:'inc-ctr', roi:'↑ Inclusion + CTR', roiClass:'inc-ctr', who:'Client', whoClass:'client' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Visibility & Inclusion', pillarColor:'purple',
+    issue:'No comparative framing', what:'Not positioned against alternatives in content', also:'also Competitive Positioning',
+    service:'Content Strategy', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'Client / 3WM', whoClass:'both' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Visibility & Inclusion', pillarColor:'purple',
+    issue:'No comparative structure', what:'Cannot be evaluated against competitors by the AI', also:'also Competitive Positioning',
+    service:'AI Enablement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+
+  // ── POSITIONING ACCURACY / Source Dependence ──────────────────────────────
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Source Dependence', pillarColor:'purple',
+    issue:'Source dependence', what:'Visibility tied to a small number of sources',
+    service:'Measurement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+  { layer:'Positioning Accuracy', layerColor:'purple', pillar:'Source Dependence', pillarColor:'purple',
+    issue:'Fragile source dependence', what:'Visibility collapses if one key source drops from AI training',
+    service:'AI Enablement', roiKey:'inclusion', roi:'↑ Inclusion', roiClass:'inc', who:'3WM', whoClass:'agency' },
+
+  // ── SELECTION CONFIDENCE / Authority & Trust ──────────────────────────────
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Authority & Trust', pillarColor:'amber',
+    issue:'Authority gap', what:'Claims not backed by external corroboration the AI can cite',
+    service:'Measurement', roiKey:'close', roi:'↑ Close rate', roiClass:'cls', who:'3WM', whoClass:'agency' },
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Authority & Trust', pillarColor:'amber',
+    issue:'Confidence threshold', what:'Known by the AI, but not strongly enough to be selected over alternatives',
+    service:'Measurement', roiKey:'close', roi:'↑ Close rate', roiClass:'cls', who:'3WM', whoClass:'agency' },
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Authority & Trust', pillarColor:'amber',
+    issue:'No selection justification', what:'No clear evidence structure to support AI inclusion over competitors',
+    service:'AI Enablement', roiKey:'close', roi:'↑ Close rate', roiClass:'cls', who:'3WM', whoClass:'agency' },
+
+  // ── SELECTION CONFIDENCE / Representation Quality ─────────────────────────
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Representation Quality', pillarColor:'amber',
+    issue:'Compression failure', what:'Key attributes are dropped when AI reduces content to a short answer',
+    service:'Measurement', roiKey:'ctr', roi:'↑ CTR', roiClass:'ctr', who:'3WM', whoClass:'agency' },
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Representation Quality', pillarColor:'amber',
+    issue:'Hedging', what:'AI avoids committing due to weak or conflicting signals',
+    service:'Measurement', roiKey:'ctr', roi:'↑ CTR', roiClass:'ctr', who:'3WM', whoClass:'agency' },
+
+  // ── SELECTION CONFIDENCE / Competitive Positioning ────────────────────────
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Competitive Positioning', pillarColor:'amber',
+    issue:'Comparative absence', what:'Not used in "best / who should I choose" queries', also:'also Visibility & Inclusion',
+    service:'Measurement', roiKey:'inc-ctr', roi:'↑ Inclusion + CTR', roiClass:'inc-ctr', who:'3WM', whoClass:'agency' },
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Competitive Positioning', pillarColor:'amber',
+    issue:'No comparative framing', what:'Not positioned against alternatives in content', also:'also Visibility & Inclusion',
+    service:'Content Strategy', roiKey:'inc-ctr', roi:'↑ Inclusion + CTR', roiClass:'inc-ctr', who:'Client / 3WM', whoClass:'both' },
+  { layer:'Selection Confidence', layerColor:'amber', pillar:'Competitive Positioning', pillarColor:'amber',
+    issue:'No comparative structure', what:'Cannot be evaluated against competitors by the AI', also:'also Visibility & Inclusion',
+    service:'AI Enablement', roiKey:'inc-ctr', roi:'↑ Inclusion + CTR', roiClass:'inc-ctr', who:'3WM', whoClass:'agency' },
+];
+
+// ── Filter state ──────────────────────────────────────────────────────────────
+let activeLayer = 'all';
+let activeSvc   = 'all';
+let activeRoi   = 'all';
+
+function filter(type, val) {
+  if (type === 'layer') {
+    activeLayer = val;
+    document.querySelectorAll('#layer-bar .fb-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+  if (type === 'service') {
+    activeSvc = val;
+    ['svc-all','svc-m','svc-c','svc-a'].forEach(id => document.getElementById(id).classList.remove('active'));
+    event.target.classList.add('active');
+  }
+  if (type === 'roi') {
+    activeRoi = val;
+    ['roi-all','roi-inc','roi-ctr','roi-cls'].forEach(id => document.getElementById(id).classList.remove('active'));
+    event.target.classList.add('active');
+  }
+  renderTable();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  let html = '';
+  let visibleCount = 0;
+  let lastLayer = null;
+  let lastPillar = null;
+
+  const filtered = ROWS.filter(r => {
+    if (activeLayer !== 'all' && r.layer !== activeLayer) return false;
+    if (activeSvc   !== 'all' && r.service !== activeSvc) return false;
+    if (activeRoi   !== 'all') {
+      if (activeRoi === 'inclusion' && !r.roiKey.includes('inclusion')) return false;
+      if (activeRoi === 'ctr'       && !r.roiKey.includes('ctr'))       return false;
+      if (activeRoi === 'close'     && r.roiKey !== 'close')            return false;
+    }
+    return true;
+  });
+
+  filtered.forEach(r => {
+    visibleCount++;
+
+    // Layer section header
+    if (r.layer !== lastLayer) {
+      const layerDesc = r.layer === 'Entity Hardening' ? 'Identity clarity — brand defense'
+        : r.layer === 'Positioning Accuracy' ? 'Category alignment — correct decision set'
+        : 'Signal density — primary recommendation';
+      html += `
+        <tr class="layer-row">
+          <td colspan="6">
+            <div class="layer-row-inner">
+              <span class="layer-pill ${r.layerColor}">${r.layer}</span>
+              <span class="layer-row-title">${layerDesc}</span>
+            </div>
+          </td>
+        </tr>`;
+      lastLayer = r.layer;
+      lastPillar = null;
+    }
+
+    // Pillar sub-header
+    if (r.pillar !== lastPillar) {
+      html += `
+        <tr style="background:var(--bg-subtle)">
+          <td colspan="6" style="padding:6px 14px 6px 28px;border-bottom:1px solid var(--border)">
+            <span style="font-size:11px;font-weight:600;color:var(--ink-muted)">${r.pillar}</span>
+          </td>
+        </tr>`;
+      lastPillar = r.pillar;
+    }
+
+    html += `
+      <tr>
+        <td>
+          <div class="issue-name">${r.issue}</div>
+        </td>
+        <td>
+          <div class="issue-what">${r.what}${r.also ? `<span class="also-tag">${r.also}</span>` : ''}</div>
+        </td>
+        <td><span class="pillar-tag ${r.pillarColor}">${r.pillar}</span></td>
+        <td><span class="src-chip ${r.service==='Measurement'?'m':r.service==='Content Strategy'?'c':'a'}">${r.service}</span></td>
+        <td><span class="roi-chip ${r.roiClass}">${r.roi}</span></td>
+        <td><span class="who-chip ${r.whoClass}">${r.who}</span></td>
+      </tr>`;
+  });
+
+  if (!html) {
+    html = `<tr><td colspan="6" style="padding:32px;text-align:center;color:var(--ink-faint);font-size:13px;font-style:italic">No issues match the selected filters.</td></tr>`;
+  }
+
+  tbody.innerHTML = html;
+  document.getElementById('row-count').textContent = `Showing ${visibleCount} of ${ROWS.length} issues`;
+}
+
+renderTable();
+</script>
+</body>
+</html>
